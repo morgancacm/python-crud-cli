@@ -1,4 +1,5 @@
 import getpass
+import json
 
 def get_hidden_password():
     try:
@@ -13,10 +14,38 @@ def show_info():
     print("Lista de registros:")
     # agregar lógica para mostrar en pantalla todos los registros.
 
+def user_validation(username, password):
+    try:
+        with open("users.txt", "r") as file:
+            users = json.load(file)
+    except FileNotFoundError:
+        users = []
+    
+    for user in users:
+        if user["username"] == username:
+            print("Oops, ese nombre de usuario está en uso.")
+            return
+
+    new_id = len(users) + 1
+
+    new_user = {
+        "id": new_id,
+        "username": username,
+        "password": password
+    }
+
+    users.append(new_user)
+
+    with open("users.txt", "w") as file:
+        json.dump(users, file, indent=2)
+    
+    print(f"Usuario registrado con éxito!. ID: {new_id}")
+
+
 def add_new_user():
-    username = input("Ingrese su nombre de usuario: ")
+    username = input("Ingrese un nombre de usuario: ")
     password = get_hidden_password()
-    # agregar lógica para añadir al usuario y que se le agregue de manera automática un id de creación.
+    user_validation(username, password)
 
 def remove_user():
     id_remove = input("Ingrese el id del usuario que desea eliminar: ")
@@ -51,3 +80,6 @@ def main():
             exit()
         else:
             print("Esta opción no existe en el sistema.")
+
+if __name__ == "__main__":
+    main()
